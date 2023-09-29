@@ -1,6 +1,6 @@
 from pico2d import *
 import random
-
+import math
 TUK_WIDTH, TUK_HEIGHT = 1200, 600
 open_canvas(TUK_WIDTH, TUK_HEIGHT)
 
@@ -28,24 +28,15 @@ hide_cursor()
 
 while running:
     clear_canvas()
-    # 마우스 위치를 랜덤으로 이동
-    if mx == x and my == y:
-        mx = random.randint(0, TUK_WIDTH - 1)
-        my = random.randint(0, TUK_HEIGHT - 1)
     # 캐릭터의 방향 설정
-    if mx > x:
-        dx = 1
-    elif mx < x:
-        dx = -1
-    else:
-        dx = 0
+    dx = mx - x
+    dy = my - y
+    distance = math.sqrt(dx ** 2 + dy ** 2)
+    if distance > 0:
+        dx /= distance
+        dy /= distance
 
-    if my > y:
-        dy = 1
-    elif my < y:
-        dy = -1
-    else:
-        dy = 0
+
     TUK_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
     if dx < 0 and dy > 0:  # 좌상
         diagonal_up.clip_draw(frame * 27, 0, 27, 32, x, y, 60, 90)
@@ -61,6 +52,11 @@ while running:
     frame = (frame + 1) % 3
     x += dx
     y += dy
+
+    # 도착하면 새로 랜덤하게 생성
+    if distance <= 1:
+        mx = random.randint(0, TUK_WIDTH - 1)
+        my = random.randint(0, TUK_HEIGHT - 1)
     handle_events()
 close_canvas()
 
